@@ -42,14 +42,13 @@ class JokeServer < Sinatra::Base
     end
 
     get '/healthCheck' do
-      #store_file = File.join(settings.root, 'models', 'joke_store.mock.json')
-      if 'PONG' == $redis.with { |r| r.ping } #File.file?(store_file)
+      store_file = File.join(settings.root, 'models', 'joke_store.mock.json')
+      if File.file?(store_file)
         json({service: 'healthCheck'})
       else
+        logger.error "File #{store_file} doesn't exist"
         status 500 # Internal Server Error
         json({service: 'healthCheck', error: 'Internal Server Error'})
-        #logger.error "File #{store_file} doesn't exist"
-        logger.error 'Redis is not responding'
       end
     end
 
@@ -74,4 +73,33 @@ class JokeServer < Sinatra::Base
       end
     end
   end
+
+  namespace '/v2' do
+    get '/healthCheck' do
+      if 'PONG' == $redis.with { |r| r.ping }
+        json({service: 'healthCheck'})
+      else
+        logger.error 'Redis is not responding'
+        halt 500, json({error: 'healthCheck error'})
+      end
+    end
+
+    get '/joke' do
+      halt 500
+    end
+
+    post '/joke' do
+      halt 500
+    end
+  end
+
+  # not_found do
+  #   status 404
+  #   json({error: 'Not found'})
+  # end
+
+  # error do
+  #   status 500
+  #   json({error: 'Internal error'})
+  # end
 end

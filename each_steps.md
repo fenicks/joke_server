@@ -378,4 +378,19 @@
 
         ...
 
- * Update /healthCheck and /joke - Add POST:/joke for joke create
+ * Update /healthCheck and /joke - Add POST:/joke for joke create : /v2 API (show halt method)
+
+ * 404 error
+
+        not_found do
+          status 404
+          json({error: 'Not found'})
+        end
+
+ * 500 error
+
+        error do
+          status 500
+          json({error: 'Unknown error'})
+        end
+
