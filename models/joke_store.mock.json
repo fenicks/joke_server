@@ -1,0 +1,30 @@
+{
+    "joke_store_current_id": 5,
+    "joke_store": [
+        {
+            "id": 1,
+            "content": "Deux asticots se retrouvent dans une pomme :\n- Tiens ! Je ne savais pas que vous habitiez le quartier !",
+            "created_at": "2014-06-12T17:00:00+00:00"
+        },
+        {
+            "id": 2,
+            "content": "Une mère dit à son garçon :\n-N'oublie pas que nous sommes sur terre pour travailler.\n- Bon, alors moi, plus tard je serai marin !",
+            "created_at": "2014-06-12T17:05:00+00:00"
+        },
+        {
+            "id": 3,
+            "content": "Je suis inquiet, je vois des points noirs.\n- Tu a vu l'oculiste ?\n- Non, des points noirs !",
+            "created_at": "2014-06-12T17:10:00+00:00"
+        },
+        {
+            "id": 4,
+            "content": "- J'ai aperçu ta copine l'autre jour, mais elle ne m'a pas vu !\n- Je sais, elle me l'a dit.",
+            "created_at": "2014-06-12T17:15:00+00:00"
+        },
+        {
+            "id": 5,
+            "content": "- Monsieur, savez-vous que votre chien aboie toute la nuit ?\n- Oh, ça ne fait rien, il dort toute la journée !",
+            "created_at": "2014-06-12T17:20:00+00:00"
+        }
+    ]
+}
