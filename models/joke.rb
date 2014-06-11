@@ -6,4 +6,5 @@ class Joke < Ohm::Model
 
   attribute :joke
   unique    :joke
+  index     :joke
 end

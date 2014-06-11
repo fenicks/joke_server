@@ -10,3 +10,8 @@ gem 'hiredis'
 gem 'redis', require: %w(redis/connection/hiredis redis)
 gem 'ohm'
 gem 'ohm-contrib'
+
+group :test do
+  gem 'rack-test'
+  gem 'simplecov', require: false
+end

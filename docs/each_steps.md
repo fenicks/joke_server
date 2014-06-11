@@ -411,6 +411,7 @@
 
           attribute :joke
           unique    :joke
+          index     :joke
         end
 
  * Add Ohm require in `joke_server.rb`
@@ -487,3 +488,106 @@
           json({error: "#{env['sinatra.error'].name}: #{env['sinatra.error'].message}"})
         end
 
+## Add test
+
+ * Create `test` dir
+ * Add test gems in Gemfile
+
+        group :test do
+          gem 'rack-test'
+          gem 'simplecov', require: false
+        end
+
+ * Run bundle install
+
+        bundle install
+
+ * Add test/test_helper.rb
+
+        ENV['RACK_ENV'] = 'test'
+
+        begin
+          require 'simplecov'
+          #SimpleCov.minimum_coverage 50
+          SimpleCov.start do
+            add_filter '/test/'
+            add_filter '/config/'
+          end
+        rescue
+          puts '[ERROR]: SimpleCov is not loaded!'
+        end
+
+        require 'test/unit'
+        require 'rack/test'
+
+        require_relative '../joke_server'
+
+        class Test::Unit::TestCase
+          include Rack::Test::Methods
+
+          def app
+            JokeServer
+          end
+        end
+
+ * Create Rakefile
+
+        require 'rake/clean'
+        require 'rake/testtask'
+
+        task default: :test
+
+        Rake::TestTask.new(:test) do |t|
+          t.test_files = FileList['test/**/*_test.rb']
+          t.warning = false
+        end
+
+ * Create test/models/joke_test.rb
+
+        require_relative '../test_helper'
+        require_relative '../../models/joke'
+
+        class JokeTest < Test::Unit::TestCase
+          def setup
+            Ohm.redis.call('flushall')
+            [{joke: 'First'}, {joke: 'Second'}, {joke: 'Third'}].each do |j|
+              Joke.create(j)
+            end
+          end
+
+          def teardown
+            Ohm.redis.call('flushall')
+          end
+
+          def test_joke_create
+            %w(First Second Third).each do |d|
+              j = Joke.with(:joke, d)
+              assert_not_nil j
+              assert_equal d, j.joke
+            end
+          end
+
+          def test_joke_update
+            third = 'Third'
+            j = Joke.with(:joke, third)
+            third_updated = 'Third updated'
+            j.joke = third_updated
+            j.save
+            assert_equal third_updated, j.joke
+            j.joke = third
+            j.save
+            assert_equal third, j.joke
+          end
+
+          def test_joke_delete
+            third = 'Third'
+            j = Joke.with(:joke, third)
+            j.delete
+            j = Joke.with(:joke, third)
+            assert_nil j
+            j = Joke.create(joke: third)
+            j.save
+          end
+        end
+
+ * Create in test/functional hi_test.rb, status_test.rb, health_check_test.rb, joke_test.rb
