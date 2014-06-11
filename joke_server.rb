@@ -52,8 +52,7 @@ class JokeServer < Sinatra::Base
         json({service: 'healthCheck'})
       else
         logger.error "File #{store_file} doesn't exist"
-        status 503 # Service Unavailable
-        json({error: 'Internal Server Error'})
+        halt 503, json({error: 'Service Unavailable'})
       end
     end
 

@@ -239,12 +239,12 @@
             end
 
             get '/healthCheck' do
-              if File.file?(File.join(settings.root, 'models', 'joke_store.mock.json'))
+              store_file = File.join(settings.root, 'models', 'joke_store.mock.json')
+              if File.file?(store_file)
                 json({service: 'healthCheck'})
               else
-                status 503 # Service Unavailable
-                json({error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
+                halt 503, json({error: 'Service Unavailable'})
               end
             end
           end
@@ -316,9 +316,8 @@
               if File.file?(store_file)
                 json({service: 'healthCheck'})
               else
-                status 503 # Service Unavailable
-                json({error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
+                halt 503, json({error: 'Service Unavailable'})
               end
             end
 
