@@ -243,7 +243,7 @@
                 json({service: 'healthCheck'})
               else
                 status 503 # Service Unavailable
-                json({service: 'healthCheck', error: 'Internal Server Error'})
+                json({error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
               end
             end
@@ -317,7 +317,7 @@
                 json({service: 'healthCheck'})
               else
                 status 503 # Service Unavailable
-                json({service: 'healthCheck', error: 'Internal Server Error'})
+                json({error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
               end
             end
@@ -464,6 +464,18 @@
               halt 403, json({error: 'Forbidden'})
             end
           end
+
+          delete '/joke/:id' do |id|
+            j = Joke[id.to_i]
+            if j
+              j.delete
+            else
+              logger.error "Joke #{id} doesn't exist"
+              halt 403, json({error: 'Forbidden'})
+            end
+          end
+
+
         end
 
  * 404 and 500 error after `helpers Sinatra::JSON` statement

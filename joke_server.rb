@@ -53,7 +53,7 @@ class JokeServer < Sinatra::Base
       else
         logger.error "File #{store_file} doesn't exist"
         status 503 # Service Unavailable
-        json({service: 'healthCheck', error: 'Internal Server Error'})
+        json({error: 'Internal Server Error'})
       end
     end
 
@@ -109,7 +109,7 @@ class JokeServer < Sinatra::Base
     post '/joke' do
       if params[:joke] && params[:joke].length > 0
         begin
-          j = Joke.create(joke: params[:joke])
+          j = Joke.create(joke: params[:joke].to_s)
           j.save
           json({service: 'joke', msg: 'created successfully'})
         rescue => e
@@ -117,6 +117,33 @@ class JokeServer < Sinatra::Base
           halt 400, json({error: 'Bad Request'})
         end
       else
+        halt 403, json({error: 'Forbidden'})
+      end
+    end
+
+    delete '/joke/:id' do |id|
+      j = Joke[id.to_i]
+      if j
+        j.delete
+      else
+        logger.error "Joke #{id} doesn't exist"
+        halt 403, json({error: 'Forbidden'})
+      end
+    end
+
+    patch '/joke/:id' do |id|
+      j = Joke[id.to_i]
+      if j && params[:joke] && params[:joke].length > 0
+        j.joke = params[:joke].to_s
+        begin
+          j.save
+          json({service: 'joke', msg: 'saved successfully'})
+        rescue => e
+          logger.error e.to_s
+          halt 400, json({error: 'Bad Request'})
+        end
+      else
+        logger.error "Joke #{id} doesn't exist"
         halt 403, json({error: 'Forbidden'})
       end
     end
