@@ -402,7 +402,7 @@
 
         bundle install
 
- * Create joke_store model: models/joke_store.rb
+ * Create joke model: models/joke.rb
 
         require 'ohm'
         require 'ohm/contrib'
@@ -424,39 +424,47 @@
  * Update /healthCheck and /joke - Add POST:/joke for joke create : /v2 API (show halt method)
 
         namespace '/v2' do
-            get '/healthCheck' do
-              if 'PONG' == Ohm.redis.call('PING')
-                json({service: 'healthCheck'})
-              else
-                logger.error 'Redis is not responding'
-                halt 503, json({error: 'Service Unavailable'})
-              end
-            end
-
-            get '/joke' do
-              j = Joke.all.to_a
-              if j.length > 0
-                json({joke: j[rand(j.length)].joke})
-              else
-                halt 404, json({error: 'No joke found'})
-              end
-            end
-
-            post '/joke' do
-              if params[:joke] && params[:joke].length > 0
-                begin
-                  j = Joke.create(joke: params[:joke])
-                  j.save
-                  json({service: 'joke', msg: 'created successfully'})
-                rescue => e
-                  logger.error e.to_s
-                  halt 400, json({error: 'Bad Request'})
-                end
-              else
-                halt 403, json({error: 'Forbidden'})
-              end
+          get '/healthCheck' do
+            if 'PONG' == Ohm.redis.call('PING')
+              json({service: 'healthCheck'})
+            else
+              logger.error 'Redis is not responding'
+              halt 503, json({error: 'Service Unavailable'})
             end
           end
+
+          get '/joke/?:id?' do
+            j = nil
+            if params[:id]
+              j = Joke[params[:id].to_i]
+            else
+              jokes = Joke.all.to_a
+              if jokes && jokes.length > 0
+                j = jokes[rand(jokes.length)]
+              end
+            end
+            if j
+              json({joke: j.joke})
+            else
+              halt 404, json({error: 'No joke found'})
+            end
+          end
+
+          post '/joke' do
+            if params[:joke] && params[:joke].length > 0
+              begin
+                j = Joke.create(joke: params[:joke])
+                j.save
+                json({service: 'joke', msg: 'created successfully'})
+              rescue => e
+                logger.error e.to_s
+                halt 400, json({error: 'Bad Request'})
+              end
+            else
+              halt 403, json({error: 'Forbidden'})
+            end
+          end
+        end
 
  * 404 and 500 error after `helpers Sinatra::JSON` statement
 

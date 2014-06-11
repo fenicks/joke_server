@@ -89,10 +89,18 @@ class JokeServer < Sinatra::Base
       end
     end
 
-    get '/joke' do
-      j = Joke.all.to_a
-      if j.length > 0
-        json({joke: j[rand(j.length)].joke})
+    get '/joke/?:id?' do
+      j = nil
+      if params[:id]
+        j = Joke[params[:id].to_i]
+      else
+        jokes = Joke.all.to_a
+        if jokes && jokes.length > 0
+          j = jokes[rand(jokes.length)]
+        end
+      end
+      if j
+        json({joke: j.joke})
       else
         halt 404, json({error: 'No joke found'})
       end
