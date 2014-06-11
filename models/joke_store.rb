@@ -1,4 +1,0 @@
-
-class JokeStore
-
-end

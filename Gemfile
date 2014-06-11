@@ -8,5 +8,5 @@ gem 'sinatra'#, require: 'sinatra/base'
 gem 'sinatra-contrib'
 gem 'hiredis'
 gem 'redis', require: %w(redis/connection/hiredis redis)
-gem 'connection_pool'
-
+gem 'ohm'
+gem 'ohm-contrib'

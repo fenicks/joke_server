@@ -2,16 +2,25 @@ GEM
   remote: https://rubygems.org/
   specs:
     backports (3.6.0)
-    connection_pool (2.0.0)
     hiredis (0.5.2)
     kgio (2.9.2)
+    msgpack (0.5.8)
     multi_json (1.10.1)
+    nido (0.0.1)
+    ohm (2.0.0)
+      msgpack
+      nido
+      redic
+    ohm-contrib (2.0.0)
+      ohm (~> 2.0.0)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
     raindrops (0.13.0)
+    redic (1.1.1)
+      hiredis
     redis (3.1.0)
     sinatra (1.4.5)
       rack (~> 1.4)
@@ -35,8 +44,9 @@ PLATFORMS
 
 DEPENDENCIES
   bundler
-  connection_pool
   hiredis
+  ohm
+  ohm-contrib
   redis
   sinatra
   sinatra-contrib

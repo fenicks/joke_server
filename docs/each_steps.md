@@ -33,7 +33,7 @@
  * Exec bundle install
 
         bundle install
-        bundle update
+        # bundle update
 
  * Run the app
 
@@ -126,7 +126,7 @@
 
  * Re-run the app
 
-        unicorn -E ${RACK_ENV:-development} --config=./unicorn.rb --port=${PORT:-5000}
+        unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}
 
 ## Step 4 : Add unicorn
 
@@ -141,7 +141,7 @@
         gem 'sinatra'
         gem 'sinatra-contrib'
 
- * Create unicorn.rb
+ * Create config/unicorn.rb
 
         require 'fileutils'
 
@@ -153,7 +153,7 @@
         sinatra_env = ENV['RACK_ENV']||'development'
         worker_processes(sinatra_env.to_s.downcase == 'production' ? 8 : 4)
 
-        # log_dir = File.expand_path(File.join(app_root, 'log'))
+        # log_dir = File.expand_path(File.join(app_root, 'logs'))
         # unless Dir.exist?(log_dir)
         #   FileUtils.mkdir_p log_dir
         # end
@@ -163,37 +163,38 @@
 
  * Launch command (add in run.sh)
 
-        unicorn -E ${RACK_ENV:-development} --config=./unicorn.rb --port=${PORT:-5000}
+        unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}
 
 ## Step 5 : Add mock data store for jokes
 
  * Create models/joke_store.mock.json
 
         {
+            "joke_store_current_id": 5,
             "joke_store": [
                 {
                     "id": 1,
-                    "content": "Deux asticots se retrouvent dans une pomme :\n- Tiens ! Je ne savais pas que vous habitiez le quartier !",
+                    "joke": "Deux asticots se retrouvent dans une pomme :\n- Tiens ! Je ne savais pas que vous habitiez le quartier !",
                     "created_at": "2014-06-12T17:00:00+00:00"
                 },
                 {
                     "id": 2,
-                    "content": "Une mère dit à son garçon :\n-N'oublie pas que nous sommes sur terre pour travailler.\n- Bon, alors moi, plus tard je serai marin !",
+                    "joke": "Une mère dit à son garçon :\n-N'oublie pas que nous sommes sur terre pour travailler.\n- Bon, alors moi, plus tard je serai marin !",
                     "created_at": "2014-06-12T17:05:00+00:00"
                 },
                 {
                     "id": 3,
-                    "content": "Je suis inquiet, je vois des points noirs.\n- Tu a vu l'oculiste ?\n- Non, des points noirs !",
+                    "joke": "Je suis inquiet, je vois des points noirs.\n- Tu a vu l'oculiste ?\n- Non, des points noirs !",
                     "created_at": "2014-06-12T17:10:00+00:00"
                 },
                 {
                     "id": 4,
-                    "content": "- J'ai aperçu ta copine l'autre jour, mais elle ne m'a pas vu !\n- Je sais, elle me l'a dit.",
+                    "joke": "- J'ai aperçu ta copine l'autre jour, mais elle ne m'a pas vu !\n- Je sais, elle me l'a dit.",
                     "created_at": "2014-06-12T17:15:00+00:00"
                 },
                 {
                     "id": 5,
-                    "content": "- Monsieur, savez-vous que votre chien aboie toute la nuit ?\n- Oh, ça ne fait rien, il dort toute la journée !",
+                    "joke": "- Monsieur, savez-vous que votre chien aboie toute la nuit ?\n- Oh, ça ne fait rien, il dort toute la journée !",
                     "created_at": "2014-06-12T17:20:00+00:00"
                 }
             ]
@@ -241,7 +242,7 @@
               if File.file?(File.join(settings.root, 'models', 'joke_store.mock.json'))
                 json({service: 'healthCheck'})
               else
-                status 500 # Internal Server Error
+                status 503 # Service Unavailable
                 json({service: 'healthCheck', error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
               end
@@ -249,7 +250,7 @@
           end
         end
 
- * Activate uncorn log in file
+ * Activate unicorn log in file
 
         require 'fileutils'
 
@@ -261,7 +262,7 @@
         sinatra_env = ENV['RACK_ENV']||'development'
         worker_processes(sinatra_env.to_s.downcase == 'production' ? 8 : 4)
 
-        log_dir = File.expand_path(File.join(app_root, 'log'))
+        log_dir = File.expand_path(File.join(app_root, 'logs'))
         unless Dir.exist?(log_dir)
           FileUtils.mkdir_p log_dir
         end
@@ -271,7 +272,7 @@
 
  * Re-run the app
 
-        unicorn -E ${RACK_ENV:-development} --config=./unicorn.rb --port=${PORT:-5000}
+        unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}
 
  * Test /healthCheck with non exist file and tail the log file
  * Test getting random joke
@@ -315,7 +316,7 @@
               if File.file?(store_file)
                 json({service: 'healthCheck'})
               else
-                status 500 # Internal Server Error
+                status 503 # Service Unavailable
                 json({service: 'healthCheck', error: 'Internal Server Error'})
                 logger.error "File #{store_file} doesn't exist"
               end
@@ -344,7 +345,7 @@
           end
         end
 
-## Step 7 : Add redis as datastore an d connection pool
+## Step 7 : Add redis as datastore, redis-objects and redis connection in unicorn config
 
  * Update Gemfile
 
@@ -358,39 +359,112 @@
         gem 'sinatra-contrib'
         gem 'hiredis'
         gem 'redis', require: %w(redis/connection/hiredis redis)
-        gem 'connection_pool'
+        gem 'ohm'
+        gem 'ohm-contrib'
 
- * Create a connectionPool with Redis before JokeServer Class
 
-        require 'connection_pool'
+ * Create redis connection in unicorn.rb
 
-        ## Redis over ConnectionPool
-        $redis ||= ::ConnectionPool.new(size: 4, timeout: 60) do
-          url = URI('redis://localhost:6379/0')
-          Redis.new(host: url.host, port: url.port, driver: :hiredis, db: 0)
+        require 'fileutils'
+
+        # Unicorn configuration file
+        app_root = File.expand_path(Dir.getwd)
+        working_directory app_root
+
+        # workers + the master process
+        sinatra_env = ENV['RACK_ENV']||'development'
+        worker_processes(sinatra_env.to_s.downcase == 'production' ? 8 : 4)
+
+        log_dir = File.expand_path(File.join(app_root, 'logs'))
+        unless Dir.exist?(log_dir)
+          FileUtils.mkdir_p log_dir
+        end
+        log_file = File.expand_path(File.join(log_dir, "joke_server_#{sinatra_env}.log"))
+        stderr_path log_file
+        stdout_path log_file
+
+        before_fork do |server, worker|
+          if defined?(Ohm::Model)
+            Ohm::Model.conn.reset!
+          end
+        end
+
+        after_fork do |server, worker|
+          if defined?(Ohm)
+            # default 'redis://localhost:6379/0'
+            if defined?(Ohm::Model)
+              Ohm::Model.connect
+            end
+          end
         end
 
  * Run bundle install
 
         bundle install
 
- * Create joke_store model: models/joke_store.rb and require it in joke_server.rb
+ * Create joke_store model: models/joke_store.rb
 
-        ...
+        require 'ohm'
+        require 'ohm/contrib'
+
+        class Joke < Ohm::Model
+          include Ohm::Timestamps
+
+          attribute :joke
+          unique    :joke
+        end
+
+ * Add Ohm require in `joke_server.rb`
+
+        require 'ohm'
+        require 'ohm/json'
+
+        require_relative 'models/joke'
 
  * Update /healthCheck and /joke - Add POST:/joke for joke create : /v2 API (show halt method)
 
- * 404 error
+        namespace '/v2' do
+            get '/healthCheck' do
+              if 'PONG' == Ohm.redis.call('PING')
+                json({service: 'healthCheck'})
+              else
+                logger.error 'Redis is not responding'
+                halt 503, json({error: 'Service Unavailable'})
+              end
+            end
+
+            get '/joke' do
+              j = Joke.all.to_a
+              if j.length > 0
+                json({joke: j[rand(j.length)].joke})
+              else
+                halt 404, json({error: 'No joke found'})
+              end
+            end
+
+            post '/joke' do
+              if params[:joke] && params[:joke].length > 0
+                begin
+                  j = Joke.create(joke: params[:joke])
+                  j.save
+                  json({service: 'joke', msg: 'created successfully'})
+                rescue => e
+                  logger.error e.to_s
+                  halt 400, json({error: 'Bad Request'})
+                end
+              else
+                halt 403, json({error: 'Forbidden'})
+              end
+            end
+          end
+
+ * 404 and 500 error after `helpers Sinatra::JSON` statement
 
         not_found do
-          status 404
           json({error: 'Not found'})
         end
 
- * 500 error
-
         error do
-          status 500
-          json({error: 'Unknown error'})
+          json({error: "#{env['sinatra.error'].name}: #{env['sinatra.error'].message}"})
         end
 

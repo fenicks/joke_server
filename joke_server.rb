@@ -4,13 +4,10 @@ require 'json'
 require 'sinatra/namespace'
 require 'hiredis'
 require 'redis'
-require 'connection_pool'
+require 'ohm'
+require 'ohm/json'
 
-## Redis over ConnectionPool
-$redis ||= ::ConnectionPool.new(size: 4, timeout: 60) do
-  url = URI('redis://localhost:6379/0')
-  Redis.new(host: url.host, port: url.port, driver: :hiredis, db: 0)
-end
+require_relative 'models/joke'
 
 class JokeServer < Sinatra::Base
   register Sinatra::Namespace
@@ -31,6 +28,14 @@ class JokeServer < Sinatra::Base
 
   helpers Sinatra::JSON
 
+  not_found do
+    json({error: 'Not found'})
+  end
+
+  error do
+    json({error: "#{env['sinatra.error'].name}: #{env['sinatra.error'].message}"})
+  end
+
   get '/hi' do
     json({msg: 'Hello World!'})
   end
@@ -47,7 +52,7 @@ class JokeServer < Sinatra::Base
         json({service: 'healthCheck'})
       else
         logger.error "File #{store_file} doesn't exist"
-        status 500 # Internal Server Error
+        status 503 # Service Unavailable
         json({service: 'healthCheck', error: 'Internal Server Error'})
       end
     end
@@ -76,30 +81,36 @@ class JokeServer < Sinatra::Base
 
   namespace '/v2' do
     get '/healthCheck' do
-      if 'PONG' == $redis.with { |r| r.ping }
+      if 'PONG' == Ohm.redis.call('PING')
         json({service: 'healthCheck'})
       else
         logger.error 'Redis is not responding'
-        halt 500, json({error: 'healthCheck error'})
+        halt 503, json({error: 'Service Unavailable'})
       end
     end
 
     get '/joke' do
-      halt 500
+      j = Joke.all.to_a
+      if j.length > 0
+        json({joke: j[rand(j.length)].joke})
+      else
+        halt 404, json({error: 'No joke found'})
+      end
     end
 
     post '/joke' do
-      halt 500
+      if params[:joke] && params[:joke].length > 0
+        begin
+          j = Joke.create(joke: params[:joke])
+          j.save
+          json({service: 'joke', msg: 'created successfully'})
+        rescue => e
+          logger.error e.to_s
+          halt 400, json({error: 'Bad Request'})
+        end
+      else
+        halt 403, json({error: 'Forbidden'})
+      end
     end
   end
-
-  # not_found do
-  #   status 404
-  #   json({error: 'Not found'})
-  # end
-
-  # error do
-  #   status 500
-  #   json({error: 'Internal error'})
-  # end
 end
