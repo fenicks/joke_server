@@ -12,6 +12,83 @@ La présentation est sur Slideshare : [http://fr.slideshare.net/christiankakesa/
  * A la racine du projet exécuter `bundle install`
  * Lancer le projet en exécutant `./run.sh` ou directement `unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}`
 
+## Utilisation des services web implémentés
+
+### Web service `/hi`
+
+ * Méthode HTTP : `GET`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `N/A`
+
+### Namespace `/v1`
+
+#### Web service `/v1/status`
+
+ * Méthode HTTP : `GET`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `N/A`
+
+#### Web service `/v1/healthCheck` : Test en plus du service, la présence du fichier mock des blagues
+
+ * Méthode HTTP : `GET`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `503`
+
+#### Web service `/v1/joke` : La v1 ne récupère aléatoirement une blague depuis un fichier mock.
+
+ * Méthode HTTP : `GET`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `N/A`, renvoi une blague par défaut qui contient le texte **Joker!**
+
+### Namespace `/v2`
+
+#### Web service `/v2/healthCheck` : Test en plus du service, la connection à Redis
+
+ * Méthode HTTP : `GET`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `503`
+
+#### Web service `/v2/joke`
+
+##### Récupère aléatoirement une blague depuis Redis.
+
+ * Méthode HTTP : `GET`
+ * Espace de nom : `/v2/joke`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `404`
+
+##### Récupère spécifiquement une blague depuis Redis.
+
+ * Méthode HTTP : `GET`
+ * Espace de nom : `/v2/joke/[id:Integer]`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `404`
+
+##### Ajoute une blague dans Redis.
+
+ * Méthode HTTP : `POST`
+ * Espace de nom : `/v2/joke`
+ * Paramètre : `joke`, contenu de la blague
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `400`, impossible de créer la blague dans Redis
+ * Code HTTP d'erreur : `403`, paramètre manquant
+
+##### Supprime une blague dans Redis.
+
+ * Méthode HTTP : `DELETE`
+ * Espace de nom : `/v2/joke/[id:Integer]`
+ * Code HTTP OK : `200`
+ * Code HTTP d'erreur : `403`, la blague à supprimer n'existe pas
+
+##### Modifie une blague dans Redis.
+
+  * Méthode HTTP : `PATCH`
+  * Espace de nom : `/v2/joke/[id:Integer]`
+  * Paramètre : `joke`, nouveau contenu de la blague
+  * Code HTTP OK : `200`
+  * Code HTTP d'erreur : `400`, impossible de modifier la blague dans Redis
+  * Code HTTP d'erreur : `403`, paramètre manquant
+
 ## Technologies utilisées
 
 - Ruby : [https://www.ruby-lang.org](https://www.ruby-lang.org "Ruby")
