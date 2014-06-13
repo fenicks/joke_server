@@ -3,14 +3,14 @@ require_relative '../../models/joke'
 
 class JokeTest < Test::Unit::TestCase
   def setup
-    Ohm.redis.call('flushall')
+    Ohm.redis.call('FLUSHALL')
     [{joke: 'First'}, {joke: 'Second'}, {joke: 'Third'}].each do |j|
       Joke.create(j)
     end
   end
 
   def teardown
-    Ohm.redis.call('flushall')
+    Ohm.redis.call('FLUSHALL')
   end
 
   def test_joke_create
