@@ -124,6 +124,7 @@ class JokeServer < Sinatra::Base
       j = Joke[id.to_i]
       if j
         j.delete
+        json({service: 'joke', msg: 'deleted successfully'})
       else
         logger.error "Joke #{id} doesn't exist"
         halt 403, json({error: 'Forbidden'})
