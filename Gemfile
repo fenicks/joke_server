@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.1.2'
+#ruby '2.1.2'
 
 gem 'bundler'
 gem 'unicorn'
@@ -12,6 +12,7 @@ gem 'ohm'
 gem 'ohm-contrib'
 
 group :test do
+  gem 'rake'
   gem 'rack-test'
   gem 'simplecov', require: false
 end
