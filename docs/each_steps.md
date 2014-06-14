@@ -494,6 +494,7 @@
  * Add test gems in Gemfile
 
         group :test do
+          gem 'rake'
           gem 'rack-test'
           gem 'simplecov', require: false
         end
