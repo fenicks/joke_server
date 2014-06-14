@@ -34,7 +34,7 @@ La présentation est sur Slideshare : [http://fr.slideshare.net/christiankakesa/
  * Code HTTP OK : `200`
  * Code HTTP d'erreur : `503`
 
-#### Web service `/v1/joke` : La v1 ne récupère aléatoirement une blague depuis un fichier mock.
+#### Web service `/v1/joke` : La v1 récupère aléatoirement une blague depuis un fichier mock.
 
  * Méthode HTTP : `GET`
  * Code HTTP OK : `200`
