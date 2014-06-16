@@ -13,11 +13,13 @@ end
 
 require 'test/unit'
 require 'rack/test'
+require 'ohm'
 
 require_relative '../joke_server'
 
 class Test::Unit::TestCase
   include Rack::Test::Methods
+  Ohm.redis = Redic.new('redis://localhost:6379/0')
 
   def app
     JokeServer

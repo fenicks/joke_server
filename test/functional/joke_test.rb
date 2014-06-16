@@ -3,11 +3,14 @@ require_relative '../../models/joke'
 
 class JokeTest < Test::Unit::TestCase
   def setup
-    Ohm.redis.call('FLUSHALL')
+    Ohm.redis.call('FLUSHDB')
+    [{joke: 'JokeTestFirst'}, {joke: 'JokeTestSecond'}, {joke: 'JokeTestThird'}].each do |j|
+      Joke.create(j)
+    end
   end
 
   def teardown
-    Ohm.redis.call('FLUSHALL')
+    Ohm.redis.call('FLUSHDB')
   end
 
   def test_joke_v1
@@ -21,11 +24,11 @@ class JokeTest < Test::Unit::TestCase
     assert last_response.ok?
     assert_not_nil last_response.body
 
-    post '/v2/joke', {joke: 'The first'}
+    post '/v2/joke', {joke: 'JokeTestFourth'}
     assert last_response.ok?
     assert_not_nil last_response.body
 
-    str_updated = 'The first updated'
+    str_updated = 'JokeTestFourth updated'
 
     patch '/v2/joke/1', {joke: str_updated}
     assert last_response.ok?
