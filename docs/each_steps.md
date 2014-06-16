@@ -13,7 +13,7 @@
 
         source 'https://rubygems.org'
 
-        ruby '2.1.2'
+        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'sinatra'
@@ -67,7 +67,7 @@
 
         source 'https://rubygems.org'
 
-        ruby '2.1.2'
+        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'sinatra'
@@ -94,7 +94,7 @@
 
         source 'https://rubygems.org'
 
-        ruby '2.1.2'
+        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'sinatra'
@@ -134,7 +134,7 @@
 
         source 'https://rubygems.org'
 
-        ruby '2.1.2'
+        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'unicorn'
@@ -152,14 +152,6 @@
         # workers + the master process
         sinatra_env = ENV['RACK_ENV']||'development'
         worker_processes(sinatra_env.to_s.downcase == 'production' ? 8 : 4)
-
-        # log_dir = File.expand_path(File.join(app_root, 'logs'))
-        # unless Dir.exist?(log_dir)
-        #   FileUtils.mkdir_p log_dir
-        # end
-        # log_file = File.expand_path(File.join(log_dir, "joke_server_#{sinatra_env}.log"))
-        # stderr_path log_file
-        # stdout_path log_file
 
  * Launch command (add in run.sh)
 
@@ -350,7 +342,7 @@
 
         source 'https://rubygems.org'
 
-        ruby '2.1.2'
+        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'unicorn'
@@ -382,17 +374,15 @@
         stderr_path log_file
         stdout_path log_file
 
-        before_fork do |server, worker|
-          if defined?(Ohm::Model)
-            Ohm::Model.conn.reset!
-          end
-        end
+        # before_fork do |server, worker|
+        #
+        # end
 
         after_fork do |server, worker|
           if defined?(Ohm)
             # default 'redis://localhost:6379/0'
             if defined?(Ohm::Model)
-              Ohm::Model.connect
+              Ohm.redis = Redic.new('redis://localhost:6379/0')
             end
           end
         end
@@ -404,7 +394,7 @@
  * Create joke model: models/joke.rb
 
         require 'ohm'
-        require 'ohm/contrib'
+        require 'ohm/timestamps'
 
         class Joke < Ohm::Model
           include Ohm::Timestamps
@@ -520,11 +510,13 @@
 
         require 'test/unit'
         require 'rack/test'
+        require 'ohm'
 
         require_relative '../joke_server'
 
         class Test::Unit::TestCase
           include Rack::Test::Methods
+          Ohm.redis = Redic.new('redis://localhost:6379/0')
 
           def app
             JokeServer
@@ -543,25 +535,25 @@
           t.warning = false
         end
 
- * Create test/models/joke_test.rb
+ * Create test/models/joke_model_test.rb
 
         require_relative '../test_helper'
         require_relative '../../models/joke'
 
-        class JokeTest < Test::Unit::TestCase
+        class JokeModelTest < Test::Unit::TestCase
           def setup
-            Ohm.redis.call('flushall')
-            [{joke: 'First'}, {joke: 'Second'}, {joke: 'Third'}].each do |j|
+            Ohm.redis.call('FLUSHDB')
+            [{joke: 'JokeModelTestFirst'}, {joke: 'JokeModelTestSecond'}, {joke: 'JokeModelTestThird'}].each do |j|
               Joke.create(j)
             end
           end
 
           def teardown
-            Ohm.redis.call('flushall')
+            Ohm.redis.call('FLUSHDB')
           end
 
           def test_joke_create
-            %w(First Second Third).each do |d|
+            %w(JokeModelTestFirst JokeModelTestSecond JokeModelTestThird).each do |d|
               j = Joke.with(:joke, d)
               assert_not_nil j
               assert_equal d, j.joke
@@ -569,9 +561,9 @@
           end
 
           def test_joke_update
-            third = 'Third'
+            third = 'JokeModelTestThird'
             j = Joke.with(:joke, third)
-            third_updated = 'Third updated'
+            third_updated = 'JokeModelTestThird updated'
             j.joke = third_updated
             j.save
             assert_equal third_updated, j.joke
@@ -581,7 +573,7 @@
           end
 
           def test_joke_delete
-            third = 'Third'
+            third = 'JokeModelTestThird'
             j = Joke.with(:joke, third)
             j.delete
             j = Joke.with(:joke, third)
