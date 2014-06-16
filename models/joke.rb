@@ -1,5 +1,5 @@
 require 'ohm'
-require 'ohm/contrib'
+require 'ohm/timestamps'
 
 class Joke < Ohm::Model
   include Ohm::Timestamps
