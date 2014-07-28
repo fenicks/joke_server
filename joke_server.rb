@@ -108,13 +108,13 @@ class JokeServer < Sinatra::Base
     post '/joke' do
       if params[:joke] && params[:joke].length > 0
         begin
-          j = Joke.create(joke: params[:joke].to_s)
+          j = Joke.create(joke: params[:joke])
           j.save
-          json({service: 'joke', msg: 'created successfully'})
         rescue => e
           logger.error e.to_s
           halt 400, json({error: 'Bad Request'})
         end
+        json({service: 'joke', msg: 'created successfully'})
       else
         halt 403, json({error: 'Forbidden'})
       end
@@ -134,7 +134,7 @@ class JokeServer < Sinatra::Base
     patch '/joke/:id' do |id|
       j = Joke[id.to_i]
       if j && params[:joke] && params[:joke].length > 0
-        j.joke = params[:joke].to_s
+        j.joke = params[:joke]
         begin
           j.save
           json({service: 'joke', msg: 'saved successfully'})
