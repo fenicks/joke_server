@@ -26,4 +26,3 @@ after_fork do |server, worker|
     Ohm.redis = Redic.new('redis://localhost:6379/0', 30)
   end
 end
-
