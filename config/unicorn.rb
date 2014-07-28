@@ -16,16 +16,14 @@ log_file = File.expand_path(File.join(log_dir, "joke_server_#{sinatra_env}.log")
 stderr_path log_file
 stdout_path log_file
 
-# before_fork do |server, worker|
+#before_fork do |server, worker|
 #
-# end
+#end
 
 after_fork do |server, worker|
   if defined?(Ohm)
     # default 'redis://localhost:6379/0'
-    if defined?(Ohm::Model)
-      Ohm.redis = Redic.new('redis://localhost:6379/0')
-    end
+    Ohm.redis = Redic.new('redis://localhost:6379/0', 30)
   end
 end
 
