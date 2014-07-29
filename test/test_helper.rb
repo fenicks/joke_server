@@ -2,7 +2,7 @@ ENV['RACK_ENV'] = 'test'
 
 begin
   require 'simplecov'
-  #SimpleCov.minimum_coverage 50
+  # SimpleCov.minimum_coverage 50
   SimpleCov.start do
     add_filter '/test/'
     add_filter '/config/'
@@ -19,7 +19,7 @@ require_relative '../joke_server'
 
 class Test::Unit::TestCase
   include Rack::Test::Methods
-  Ohm.redis = Redic.new('redis://localhost:6379/0')
+  Ohm.redis = Redic.new('redis://localhost:6379/0', 10)
 
   def app
     JokeServer

@@ -29,7 +29,7 @@ class JokeServer < Sinatra::Base
   helpers Sinatra::JSON
 
   not_found do
-    json({error: 'Not found'})
+    json({ error: 'Not found' })
   end
 
   error do
@@ -37,22 +37,22 @@ class JokeServer < Sinatra::Base
   end
 
   get '/hi' do
-    json({msg: 'Hello World!'})
+    json({ msg: 'Hello World!' })
   end
 
   namespace '/v1' do
     get '/status' do
       #status 200
-      json({service: 'status'})
+      json({ service: 'status' })
     end
 
     get '/healthCheck' do
       store_file = File.join(settings.root, 'models', 'joke_store.mock.json')
       if File.file?(store_file)
-        json({service: 'healthCheck'})
+        json({ service: 'healthCheck' })
       else
         logger.error "File #{store_file} doesn't exist"
-        halt 503, json({error: 'Service Unavailable'})
+        halt 503, json({ error: 'Service Unavailable' })
       end
     end
 
@@ -67,13 +67,13 @@ class JokeServer < Sinatra::Base
           data = data['joke_store']
           length = data.length
           index = rand(length)
-          json({joke: data[index]})
+          json({ joke: data[index] })
         else
           raise RuntimeError, 'Store file error'
         end
       rescue => e
         logger.error e.to_s
-        json({joke: 'Joker!'})
+        json({ joke: 'Joker!' })
       end
     end
   end
@@ -81,10 +81,10 @@ class JokeServer < Sinatra::Base
   namespace '/v2' do
     get '/healthCheck' do
       if 'PONG' == Ohm.redis.call('PING')
-        json({service: 'healthCheck'})
+        json({ service: 'healthCheck' })
       else
         logger.error 'Redis is not responding'
-        halt 503, json({error: 'Service Unavailable'})
+        halt 503, json({ error: 'Service Unavailable' })
       end
     end
 
@@ -94,14 +94,12 @@ class JokeServer < Sinatra::Base
         j = Joke[params[:id].to_i]
       else
         jokes = Joke.all.to_a
-        if jokes && jokes.length > 0
-          j = jokes[rand(jokes.length)]
-        end
+        j = jokes[rand(jokes.length)] if jokes && jokes.length > 0
       end
       if j
-        json({joke: j.joke})
+        json({ joke: j.joke })
       else
-        halt 404, json({error: 'No joke found'})
+        halt 404, json({ error: 'No joke found' })
       end
     end
 
@@ -112,11 +110,11 @@ class JokeServer < Sinatra::Base
           j.save
         rescue => e
           logger.error e.to_s
-          halt 400, json({error: 'Bad Request'})
+          halt 400, json({ error: 'Bad Request' })
         end
         json({service: 'joke', msg: 'created successfully'})
       else
-        halt 403, json({error: 'Forbidden'})
+        halt 403, json({ error: 'Forbidden' })
       end
     end
 
@@ -124,10 +122,10 @@ class JokeServer < Sinatra::Base
       j = Joke[id.to_i]
       if j
         j.delete
-        json({service: 'joke', msg: 'deleted successfully'})
+        json({ service: 'joke', msg: 'deleted successfully' })
       else
         logger.error "Joke #{id} doesn't exist"
-        halt 403, json({error: 'Forbidden'})
+        halt 403, json({ error: 'Forbidden' })
       end
     end
 
@@ -137,14 +135,14 @@ class JokeServer < Sinatra::Base
         j.joke = params[:joke]
         begin
           j.save
-          json({service: 'joke', msg: 'saved successfully'})
+          json({ service: 'joke', msg: 'saved successfully' })
         rescue => e
           logger.error e.to_s
-          halt 400, json({error: 'Bad Request'})
+          halt 400, json({ error: 'Bad Request' })
         end
       else
         logger.error "Joke #{id} doesn't exist"
-        halt 403, json({error: 'Forbidden'})
+        halt 403, json({ error: 'Forbidden' })
       end
     end
   end

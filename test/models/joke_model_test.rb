@@ -4,7 +4,7 @@ require_relative '../../models/joke'
 class JokeModelTest < Test::Unit::TestCase
   def setup
     Ohm.redis.call('FLUSHDB')
-    [{joke: 'JokeModelTestFirst'}, {joke: 'JokeModelTestSecond'}, {joke: 'JokeModelTestThird'}].each do |j|
+    [{ joke: 'JokeModelTestFirst' }, { joke: 'JokeModelTestSecond' }, { joke: 'JokeModelTestThird' }].each do |j|
       Joke.create(j)
     end
   end

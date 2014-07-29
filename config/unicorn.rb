@@ -9,16 +9,15 @@ sinatra_env = ENV['RACK_ENV']||'development'
 worker_processes(sinatra_env.to_s.downcase == 'production' ? 8 : 4)
 
 log_dir = File.expand_path(File.join(app_root, 'logs'))
-unless Dir.exist?(log_dir)
-  FileUtils.mkdir_p log_dir
-end
+FileUtils.mkdir_p(log_dir) unless Dir.exist?(log_dir)
+  
 log_file = File.expand_path(File.join(log_dir, "joke_server_#{sinatra_env}.log"))
 stderr_path log_file
 stdout_path log_file
 
-#before_fork do |server, worker|
-#
-#end
+# before_fork do |server, worker|
+#  # do something
+# end
 
 after_fork do |server, worker|
   if defined?(Ohm)
