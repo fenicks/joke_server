@@ -33,7 +33,7 @@ class JokeServer < Sinatra::Base
   end
 
   error do
-    json({error: "#{env['sinatra.error'].name}: #{env['sinatra.error'].message}"})
+    json({ error: "#{env['sinatra.error'].name}: #{env['sinatra.error'].message}" })
   end
 
   get '/hi' do
