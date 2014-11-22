@@ -1,14 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    backports (3.6.0)
+    backports (3.6.4)
     docile (1.1.5)
     hiredis (0.5.2)
     kgio (2.9.2)
-    msgpack (0.5.8)
+    msgpack (0.5.9)
     multi_json (1.10.1)
     nido (0.0.1)
-    ohm (2.0.0)
+    ohm (2.0.1)
       msgpack
       nido
       redic
@@ -24,9 +24,9 @@ GEM
     redic (1.1.1)
       hiredis
     redis (3.1.0)
-    simplecov (0.8.2)
+    simplecov (0.9.1)
       docile (~> 1.1.0)
-      multi_json
+      multi_json (~> 1.0)
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
     sinatra (1.4.5)
