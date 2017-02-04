@@ -3,17 +3,14 @@
 ## Step 1 : Init
 
  * Create joke_server directory
- * Create this files : .versions.conf - Gemfile - joke_server.rb
+ * Create this files : .ruby-version - Gemfile - joke_server.rb
  * Populate .version.conf
 
-        ruby=ruby-2.1.2
-        ruby-gemset=joke_server
+        ruby-2.4.0@joke_server
 
  * Populate Gemfile
 
         source 'https://rubygems.org'
-
-        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'sinatra'
@@ -67,8 +64,6 @@
 
         source 'https://rubygems.org'
 
-        #ruby '2.1.2'
-
         gem 'bundler'
         gem 'sinatra'
         gem 'sinatra-contrib'
@@ -93,8 +88,6 @@
  * Update Gemfile with sinatra/contrib
 
         source 'https://rubygems.org'
-
-        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'sinatra'
@@ -133,8 +126,6 @@
  * Update Gemfile
 
         source 'https://rubygems.org'
-
-        #ruby '2.1.2'
 
         gem 'bundler'
         gem 'unicorn'
@@ -342,14 +333,10 @@
 
         source 'https://rubygems.org'
 
-        #ruby '2.1.2'
-
         gem 'bundler'
         gem 'unicorn'
         gem 'sinatra'#, require: 'sinatra/base'
         gem 'sinatra-contrib'
-        gem 'hiredis'
-        gem 'redis', require: %w(redis/connection/hiredis redis)
         gem 'ohm'
         gem 'ohm-contrib'
 
@@ -444,7 +431,6 @@
             if params[:joke] && params[:joke].length > 0
               begin
                 j = Joke.create(joke: params[:joke])
-                j.save
                 json({service: 'joke', msg: 'created successfully'})
               rescue => e
                 logger.error e.to_s
@@ -480,60 +466,62 @@
 
 ## Add test
 
- * Create `test` dir
+ * Create `spec` dir
  * Add test gems in Gemfile
 
         group :test do
-          gem 'rake'
-          gem 'rack-test'
-          gem 'simplecov', require: false
+          gem 'capybara'
+          gem 'rspec'
+          gem 'rubocop'
+          gem 'simplecov'
         end
 
  * Run bundle install
 
         bundle install
 
- * Add test/test_helper.rb
+ * Add spec/spec_helper.rb
 
+        # frozen_string_literal: true
+        if ENV['RACK_ENV'] == 'production'
+          puts '/!\ Test could not be run in production environment'
+          exit 42
+        end
         ENV['RACK_ENV'] = 'test'
 
-        begin
-          require 'simplecov'
-          #SimpleCov.minimum_coverage 50
-          SimpleCov.start do
-            add_filter '/test/'
-            add_filter '/config/'
-          end
-        rescue
-          puts '[ERROR]: SimpleCov is not loaded!'
-        end
-
-        require 'test/unit'
         require 'rack/test'
+        require 'capybara/rspec'
         require 'ohm'
+        require 'simplecov'
+
+        SimpleCov.start
 
         require_relative '../joke_server'
 
-        class Test::Unit::TestCase
+        module RSpecMixin
           include Rack::Test::Methods
-          Ohm.redis = Redic.new('redis://localhost:6379/0')
+          include Capybara::DSL
+
+          Ohm.redis = Redic.new('redis://localhost:6379/0', 10)
 
           def app
             JokeServer
           end
         end
 
+        RSpec.configure do |config|
+          config.include RSpecMixin
+        end
+
  * Create Rakefile
 
-        require 'rake/clean'
-        require 'rake/testtask'
+        # frozen_string_literal: true
+        require 'rspec/core/rake_task'
 
-        task default: :test
+        RSpec::Core::RakeTask.new('spec')
 
-        Rake::TestTask.new(:test) do |t|
-          t.test_files = FileList['test/**/*_test.rb']
-          t.warning = false
-        end
+        task default: :spec
+
 
  * Create test/models/joke_model_test.rb
 

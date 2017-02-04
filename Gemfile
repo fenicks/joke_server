@@ -1,18 +1,18 @@
+# frozen_string_literal: true
 source 'https://rubygems.org'
 
-#ruby '2.1.4'
-
 gem 'bundler'
-gem 'unicorn'
-gem 'sinatra'#, require: 'sinatra/base'
+gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'hiredis'
-gem 'redis', require: %w(redis/connection/hiredis redis)
+gem 'unicorn'
 gem 'ohm'
 gem 'ohm-contrib'
+gem 'oj'
+gem 'oj_mimic_json'
 
 group :test do
-  gem 'rake'
-  gem 'rack-test'
-  gem 'simplecov', require: false
+  gem 'capybara'
+  gem 'rspec'
+  gem 'rubocop'
+  gem 'simplecov'
 end
