@@ -2,13 +2,13 @@
 source 'https://rubygems.org'
 
 gem 'bundler'
-gem 'sinatra'
-gem 'sinatra-contrib'
-gem 'unicorn'
 gem 'ohm'
 gem 'ohm-contrib'
 gem 'oj'
 gem 'oj_mimic_json'
+gem 'sinatra'
+gem 'sinatra-contrib'
+gem 'unicorn'
 
 group :test do
   gem 'capybara'

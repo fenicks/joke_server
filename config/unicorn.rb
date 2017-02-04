@@ -12,7 +12,7 @@ worker_processes(sinatra_env.to_s.casecmp('production').zero? ? 4 : 2)
 log_dir = File.expand_path(File.join(app_root, 'logs'))
 FileUtils.mkdir_p(log_dir) unless Dir.exist?(log_dir)
 
-log_file = File.expand_path(File.join(log_dir, "joke_server_#{sinatra_env}.log"))
+log_file = File.expand_path(File.join(log_dir, "joke_#{sinatra_env}.log"))
 stderr_path log_file
 stdout_path log_file
 
