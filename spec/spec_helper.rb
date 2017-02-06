@@ -1,8 +1,4 @@
 # frozen_string_literal: true
-if ENV['RACK_ENV'] == 'production'
-  puts '/!\ Test could not be run in production environment'
-  exit 42
-end
 ENV['RACK_ENV'] = 'test'
 
 require 'rack/test'

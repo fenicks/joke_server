@@ -101,8 +101,7 @@ class JokeServer < Sinatra::Base
     post '/joke' do
       if params[:joke] && !params[:joke].empty?
         begin
-          j = Joke.create(joke: params[:joke])
-          j.save
+          Joke.create(joke: params[:joke])
         rescue => e
           logger.error e.to_s
           halt 400, json(error: 'Bad Request')
