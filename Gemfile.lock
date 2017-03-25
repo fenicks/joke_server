@@ -43,7 +43,7 @@ GEM
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    rainbow (2.2.1)
+    rainbow (2.1.0)
     raindrops (0.18.0)
     redic (1.5.0)
       hiredis
@@ -103,6 +103,7 @@ DEPENDENCIES
   ohm-contrib
   oj
   oj_mimic_json
+  rainbow (~> 2.0, != 2.2.1)
   rspec
   rubocop
   simplecov

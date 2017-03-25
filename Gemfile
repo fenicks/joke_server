@@ -12,6 +12,7 @@ gem 'unicorn'
 
 group :test do
   gem 'capybara'
+  gem 'rainbow', '~>2.0', '!=2.2.1'
   gem 'rspec'
   gem 'rubocop'
   gem 'simplecov'
