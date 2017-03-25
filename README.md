@@ -1,4 +1,4 @@
-# Joke Server
+# Joke Server [![Build Status](https://travis-ci.org/fenicks/joke_server.svg?branch=master)](https://travis-ci.org/fenicks/joke_server) [![Coverage Status](https://coveralls.io/repos/fenicks/joke_server/badge.svg?branch=master&service=github)](https://coveralls.io/github/fenicks/joke_server?branch=master)
 
 ## Description
 
