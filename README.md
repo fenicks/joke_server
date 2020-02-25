@@ -8,9 +8,11 @@ La présentation est sur Slideshare : [http://fr.slideshare.net/christiankakesa/
 
 ## Installation
 
- * Installer Ruby 2.4.0
+ * Installer Ruby 2.7.0
  * Installer Redis : [https://redis.io/topics/quickstart]()
- * A la racine du projet exécuter `bundle install`
+ * A la racine du projet exécuter :
+   * `gem install bundler`
+   * `bundle install`
  * Lancer le projet en exécutant `./run.sh` ou directement `unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}`
 
 ## Utilisation des services web implémentés

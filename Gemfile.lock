@@ -69,4 +69,4 @@ DEPENDENCIES
   unicorn (~> 4.8.3)
 
 BUNDLED WITH
-   1.13.6
+   2.1.4
