@@ -1,0 +1,5 @@
+# Reference here: https://github.com/bbatsov/rubocop/blob/master/config/enabled.yml
+
+Style/Documentation:
+  Description: 'Document classes and non-namespace modules.'
+  Enabled: false

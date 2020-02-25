@@ -1,4 +1,4 @@
-# Joke Server
+# Joke Server [![Build Status](https://travis-ci.org/fenicks/joke_server.svg?branch=master)](https://travis-ci.org/fenicks/joke_server) [![Coverage Status](https://coveralls.io/repos/fenicks/joke_server/badge.svg?branch=master&service=github)](https://coveralls.io/github/fenicks/joke_server?branch=master)
 
 ## Description
 
@@ -8,7 +8,8 @@ La présentation est sur Slideshare : [http://fr.slideshare.net/christiankakesa/
 
 ## Installation
 
- * Installer Ruby 2.1.2
+ * Installer Ruby 2.4.0
+ * Installer Redis : [https://redis.io/topics/quickstart]()
  * A la racine du projet exécuter `bundle install`
  * Lancer le projet en exécutant `./run.sh` ou directement `unicorn -E ${RACK_ENV:-development} --config=./config/unicorn.rb --port=${PORT:-5000}`
 
