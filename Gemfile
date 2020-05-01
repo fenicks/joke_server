@@ -15,5 +15,5 @@ group :test do
   gem 'rainbow', '~>2.0', '!=2.2.1'
   gem 'rspec'
   gem 'rubocop'
-  gem 'simplecov'
+  gem 'simplecov', '>= 0.14.1'
 end
