@@ -11,7 +11,7 @@ gem 'sinatra-contrib', '>= 2.0.7'
 gem 'unicorn'
 
 group :test do
-  gem 'capybara', '>= 3.31.0'
+  gem 'capybara', '>= 3.32.2'
   gem 'rainbow', '~>2.0', '!=2.2.1'
   gem 'rspec'
   gem 'rubocop'
