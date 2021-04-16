@@ -14,6 +14,6 @@ group :test do
   gem 'capybara', '>= 3.31.0'
   gem 'rainbow', '~>2.0', '!=2.2.1'
   gem 'rspec'
-  gem 'rubocop'
+  gem 'rubocop', '>= 0.80.0'
   gem 'simplecov', '>= 0.14.1'
 end
